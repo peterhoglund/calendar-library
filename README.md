@@ -34,4 +34,4 @@ The library is a script addon so you won't find it in the Plugins list after dow
 
 
 ## Documentation
-Full documentation can be found in (documentation.md)](documentation.md) and is supported in the editor through the Documentation Help section. Search for Calendar, Calendar.Date and CalendarLocale.
+Full documentation can be found in [documentation.md](documentation.md) and is supported in the editor through the Documentation Help section. Search for Calendar, Calendar.Date and CalendarLocale.
