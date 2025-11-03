@@ -78,10 +78,10 @@ Calendar works with the helper class [Calendar.Date](#calendar-date) and can loc
 >The calendar's localization settings for retrieving preformatted values. Each calendar is assigned a `CalendarLocale`, defaulting to English. Assign a custom resource to localize names and formats.  
 See [CalendarLocale](#calendarlocale).
 
-<a id="calendar-prop-first_weekday"></a>**first_weekday** : Time.Weekday
+<a id="calendar-prop-first_weekday"></a>**first_weekday** : Time.Weekday \[default: Time.WEEKDAY_MONDAY]
 >The weekday considered the first day of the week. Uses `Time.Weekday` where `Sunday = 0` and `Saturday = 6`.
 
-<a id="calendar-prop-week_number_system"></a>**week_number_system** : WeekNumberSystem
+<a id="calendar-prop-week_number_system"></a>**week_number_system** : WeekNumberSystem \[defalt: WeekNumberSystem.WEEK_NUMBER_FOUR_DAY]
 >Which system to use when calculating week numbers. See [WeekNumberSystem](#calendar-enumerations).
 
 
