@@ -100,8 +100,39 @@ See [CalendarLocale](#calendarlocale).
 >`include_adjacent_days` and `force_six_weeks` behave like in `get_calendar_month`.
 
 <a id="calendar-method-get_date_formatted"></a>**get_date_formatted(year: int, month: int, day: int, format: String = '%Y-%m-%d')** : String.   
->Returns a formatted string for the given date using a POSIX-like pattern. Supported placeholders include:  
->`%Y` four-digit year, `%y` two-digit year, `%-y` two-digit no pad, `%m` zero-padded month, `%-m` month, `%d` zero-padded day, `%-d` day, `%F` ISO8601 date, `%B`/`%b`/`%-b` month names via `CalendarLocale`, `%A`/`%a`/`%-a` weekday names via `CalendarLocale`, `%j`/`%-j` day of year, `%u` ISO weekday (Mon=1), `%w` weekday (Sun=0).
+>Returns a formatted string for a specified date, using the format pattern. This function adheres to POSIX placeholder standards, limited to placeholders for years, months, days, and weekdays (see list below of supported placeholders). The pattern can include various placeholders and any dividers between them.
+>
+>**%Y** - Full year in four digits (e.g., 2023).  
+>**%y** - Year in two digits (e.g., 23 for 2023).  
+>**%-y** - Year in two digits without zero-padding (e.g., 3 for 2003).  
+>**%m** - Month as a zero-padded number (e.g., 02 for February).  
+>**%-m** - Month as a number without zero-padding (e.g., 2 for February).  
+>**%d** - Day of the month as a zero-padded number (e.g., 05).  
+>**%-d** - Day of the month without zero-padding (e.g., 5).  
+>**%F** - Date in ISO8601 standard format (e.g., 2023-02-05).  
+>
+>**%B** - Full month name from CalendarLocale (e.g., February).  
+>**%b** - Abbreviated month name from CalendarLocale (e.g., Feb).  
+>**%-b** - Short month name from CalendarLocale (e.g., F for February).  
+>**%A** - Full weekday name from CalendarLocale (e.g., Monday).  
+>**%a** - Abbreviated weekday name from CalendarLocale (e.g., Mon).  
+>**%-a** - Short weekday name from CalendarLocale (e.g., M for Monday).  
+>
+>**%j** - Day of the year as a zero-padded number (e.g., 065 for the 65th day).  
+>**%-j** - Day of the year without zero-padding (e.g., 65 for the 65th day).  
+>**%u** - Weekday as a number (Monday = 1, Sunday = 7).  
+>**%w** - Weekday as a number (Sunday = 0, Saturday = 6).  
+>
+```gdscript
+var pattern = "%Y-%m-%d"
+var formatted_date = get_date_formatted(2023, 12, 03, pattern)
+print(formatted_date) # Will output 2023-12-03
+```
+```gdscript
+var pattern = "%A, %B %d, %Y"
+var formatted_date = get_date_formatted(2023, 12, 03, pattern)
+print(formatted_date) # Will output Sunday, December 3, 2023 
+```
 
 <a id="calendar-method-get_date_locale_format"></a>**get_date_locale_format(year: int, month: int, day: int, four_digit_year: bool = true)** : String.   
 >Formats the date using the active `CalendarLocale`'s `date_format` and `divider_symbol`.  
@@ -149,6 +180,11 @@ See [WeekdayFormat](#calendar-enumerations) and [CalendarLocale](#calendarlocale
 
 <a id="calendar-method-get_weekdays_formatted"></a>**get_weekdays_formatted(weekday_format: WeekdayFormat = 1)** : Array\[String].   
 >Returns weekday names starting at `first_weekday`, formatted by `weekday_format`.
+```gdscript
+cal.set_weekday(Time.WEEKDAY_THURSDAY)
+cal.get_weekdays_formatted(WeekdayFormat.WEEKDAY_FORMAT_FULL)
+# Outputs Thursday, Friday, Saturday, Sunday, Monday, Tuesday, Wednesday
+```
 
 <a id="calendar-method-get_weeks_of_month"></a>**get_weeks_of_month(year: int, month: int, force_six_weeks: bool = false)** : Array\[int].   
 >Returns all week numbers present in the month.  
@@ -162,7 +198,11 @@ See [WeekdayFormat](#calendar-enumerations) and [CalendarLocale](#calendarlocale
 
 <a id="calendar-method-set_first_weekday"></a>**set_first_weekday(first_weekday: Time.Weekday)** : void.   
 >Sets the first day of the week for the calendar.
-
+```gdscript
+# Set the calendar's first day of the week to Monday.
+var cal = Calendar.new()
+cal.set_first_weekday(Time.WEEKDAY_MONDAY)
+```
 <a id="calendar-method-set_week_number_system"></a>**set_week_number_system(week_number_system: WeekNumberSystem)** : void.   
 >Sets the week numbering system. See [WeekNumberSystem](#calendar-enumerations).
 
@@ -277,6 +317,10 @@ Calendar.Date holds a specific date composed of year, month, and day. It is used
 
 <a id="date-method-today"></a>**today()** : Date (static)  
 >Returns a new `Calendar.Date` set to today's system date.
+```gdscript
+var todays_date = Calendar.Date.today()
+print(todays_date) # Outputs the current date from the system
+```
 
 ---
 
