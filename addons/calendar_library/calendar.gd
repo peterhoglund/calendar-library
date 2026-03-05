@@ -464,19 +464,17 @@ func get_day_of_year(year: int, month: int, day: int) -> int:
 ## across multiple months.
 func get_weeks_of_month(year: int, month: int, force_six_weeks: bool = false) -> Array[int]:
 	var weeks : Array[int] = []
-	var day = 1
 	var days_in_month = get_days_in_month(year, month)
 
-	# Get the week number of the first day of the month
-	var first_week = get_week_number(year, month, day)
-	weeks.append(first_week)
-
-	# Iterate through the month, week by week
-	while day <= days_in_month:
+	# Iterate through all days in the month and add each week transition.
+	# This avoids missing a final week that can start near month end.
+	var previous_week = get_week_number(year, month, 1)
+	weeks.append(previous_week)
+	for day in range(2, days_in_month + 1):
 		var current_week = get_week_number(year, month, day)
-		if current_week != weeks[weeks.size() - 1]:
+		if current_week != previous_week:
 			weeks.append(current_week)
-		day += 7  # Move to the next week
+			previous_week = current_week
 
 	# Ensure six weeks are returned, if needed
 	if force_six_weeks and weeks.size() < 6:
@@ -488,7 +486,7 @@ func get_weeks_of_month(year: int, month: int, force_six_weeks: bool = false) ->
 		var day_in_next_month = 1
 		while weeks.size() < 6:
 			var week_in_next_month = get_week_number(next_year, next_month, day_in_next_month)
-			if week_in_next_month not in weeks:
+			if week_in_next_month != weeks[weeks.size() - 1]:
 				weeks.append(week_in_next_month)
 			day_in_next_month += 7
 
@@ -564,7 +562,7 @@ func get_date_formatted(year: int, month: int, day: int, format: String = "%Y-%m
 	var format_mappings = {
 		"%Y": func(y, m, d): return str(y),
 		"%y": func(y, m, d): return str(y).right(2),
-		"%-y": func(y, m, d): return str(y).substr(-2, 2).replace("0", ""),
+		"%-y": func(y, m, d): return str(int(str(y).right(2))),
 		"%m": func(y, m, d): return str(m).pad_zeros(2),
 		"%-m": func(y, m, d): return str(m).lstrip("0"),
 		"%d": func(y, m, d): return str(d).pad_zeros(2),
@@ -754,12 +752,14 @@ class Date:
 	@warning_ignore("integer_division")
 	func get_weekday() -> Time.Weekday:
 		# Zeller's Congruence algorithm to find the day of the week
-		if month < 3:
-			month += 12
-			year -= 1
-		var k: int = year % 100
-		var j: int = int(year / 100)
-		var f = day + (13 * (month + 1) / 5) + k + (k / 4) + (j / 4) - 2 * j
+		var calc_year := year
+		var calc_month := month
+		if calc_month < 3:
+			calc_month += 12
+			calc_year -= 1
+		var k: int = calc_year % 100
+		var j: int = int(calc_year / 100)
+		var f = day + (13 * (calc_month + 1) / 5) + k + (k / 4) + (j / 4) - 2 * j
 		# Adjusted Zeller's Congruence for Godot's Sunday = 0
 		return (f + 6) % 7 as Time.Weekday
 	
