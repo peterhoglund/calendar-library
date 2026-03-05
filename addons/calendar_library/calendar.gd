@@ -392,52 +392,45 @@ func set_week_number_system(week_number_system: WeekNumberSystem):
 
 
 ## Returns the week number for the given [param year], [param month] and [param day].
-@warning_ignore("integer_division")
 func get_week_number(year: int, month: int, day: int) -> int:
+	var weekday_offset: int = (get_weekday(year, month, day) - first_weekday + 7) % 7
+	var week_start: Date = Date.new(year, month, day)
+	week_start.subtract_days(weekday_offset)
+	
 	match week_number_system:
 		WeekNumberSystem.WEEK_NUMBER_FOUR_DAY:
-			# Construct the date object
-			var date: Date = Date.new(year, month, day)
+			# The 4th day of the week determines the week-year in the "four-day" system.
+			var majority_day: Date = week_start.duplicate()
+			majority_day.add_days(3)
 			
-			# Find the first Thursday of the year
-			var jan_first_day_of_week: int = _get_shifted_weekday(year, 1, 1)
-			var days_to_first_majority_day: int = (4 - jan_first_day_of_week + 7) % 7
-			var first_majority_day_of_year: Date = Date.new(year, 1, 1)
-			first_majority_day_of_year.add_days(days_to_first_majority_day)
+			# The week containing January 4 is always week 1 in the four-day system.
+			var week_one_offset: int = (get_weekday(majority_day.year, 1, 4) - first_weekday + 7) % 7
+			var week_one_start: Date = Date.new(majority_day.year, 1, 4)
+			week_one_start.subtract_days(week_one_offset)
 			
-			# Calculate the week number
-			var shifted_weekday: int = _get_shifted_weekday(date.year, date.month, date.day)
-			if date.is_before(first_majority_day_of_year) and shifted_weekday in [1, 2, 3]:
-				return 1
-			elif date.is_after(Date.new(date.year, 12, 28)) and shifted_weekday in [1, 2, 3]:
-				return 1
-			else:
-				return ceili( float(date.days_to(first_majority_day_of_year)) / 7 + 1 )
+			var days_from_week_one: int = week_start.days_to(week_one_start)
+			return int(floor(days_from_week_one / 7.0)) + 1
 		
 		WeekNumberSystem.WEEK_NUMBER_TRADITIONAL:
-			var date: Date = Date.new(year, month, day)
-			var start_of_year = Date.new(year, 1, 1)
+			# Week 1 is the week containing January 1.
+			var week_one_offset: int = (get_weekday(year, 1, 1) - first_weekday + 7) % 7
+			var week_one_start: Date = Date.new(year, 1, 1)
+			week_one_start.subtract_days(week_one_offset)
 			
-			# Handling the end of the year
-			if date.month == 12:
-				var days_in_december = (Date.new(year, 12, 31)).get_day_of_year()
-				var remaining_days = days_in_december - date.get_day_of_year()
+			var next_week_one_offset: int = (get_weekday(year + 1, 1, 1) - first_weekday + 7) % 7
+			var next_week_one_start: Date = Date.new(year + 1, 1, 1)
+			next_week_one_start.subtract_days(next_week_one_offset)
 			
-			# If the remaining days in December are less than a week and January 1st is not the first day of the week
-				var jan_first_day_of_week = (Date.new(year + 1, 1, 1)).get_weekday_iso()
-				if remaining_days < 7 and jan_first_day_of_week != _get_first_weekday_iso():
-					return 1
+			# Dates can belong to week 1 of the next year or the last week of the previous year.
+			if week_start.is_before(week_one_start):
+				var prev_week_one_offset: int = (get_weekday(year - 1, 1, 1) - first_weekday + 7) % 7
+				week_one_start = Date.new(year - 1, 1, 1)
+				week_one_start.subtract_days(prev_week_one_offset)
+			elif not week_start.is_before(next_week_one_start):
+				week_one_start = next_week_one_start
 			
-			var day_of_week_of_jan_first = start_of_year.get_weekday_iso()
-			var offset = (7 + _get_first_weekday_iso() - day_of_week_of_jan_first) % 7
-			
-			if offset > 3:
-				offset -= 7
-			
-			var days_since_start_of_year = date.get_day_of_year() - 1
-			var adjusted_days = days_since_start_of_year + offset
-			
-			return int(ceil(adjusted_days / 7.0)) + 1
+			var days_from_week_one: int = week_start.days_to(week_one_start)
+			return int(floor(days_from_week_one / 7.0)) + 1
 	
 	return 0
 
