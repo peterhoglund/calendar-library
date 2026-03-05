@@ -381,7 +381,22 @@ func set_first_weekday(first_weekday : Time.Weekday) -> void:
 
 ## Assign a [code]CalendarLocale[/code] resource to the calendar.
 func set_calendar_locale(path: String) -> void:
-	calendar_locale = load(path) as CalendarLocale
+	if path.is_empty():
+		push_error("CalendarLocale path can not be empty.")
+		return
+	if not (path.ends_with(".tres") or path.ends_with(".res")):
+		push_error("CalendarLocale path must point to a .tres or .res resource: %s" % path)
+		return
+	if not ResourceLoader.exists(path):
+		push_error("CalendarLocale resource was not found at path: %s" % path)
+		return
+	
+	var locale_resource: Resource = load(path)
+	if locale_resource == null or not (locale_resource is CalendarLocale):
+		push_error("Resource is not a CalendarLocale: %s" % path)
+		return
+	
+	calendar_locale = locale_resource as CalendarLocale
 
 
 ## Set which week number system to use when calculating week numbers.
@@ -490,7 +505,7 @@ func get_weeks_of_month(year: int, month: int, force_six_weeks: bool = false) ->
 ## starting from [param year], [param month], and [param day].
 ## Good for presenting a set of days or creating agenda-style overviews.
 ## [br][br]
-## Set [param exclusive] to [code]true[/code] to include the last day
+## Set [param exclusive] to [code]true[/code] to exclude the last day
 ## in the range.
 func get_days_of_range(days: int, year: int, month: int, day: int, exclusive: bool = false) -> Array[Date]:
 	var days_range: Array[Date] = []
@@ -622,13 +637,9 @@ func _get_shifted_weekday(year: int, month: int , day: int) -> int:
 
 # Turns Godot's standard Sunday = 0, Saturday = 6 to the ISO8601 standard
 # where Monday = 1, Sunday = 7.
-func _get_weekday_iso(year, month, day) -> int:
+func get_weekday_iso(year, month, day) -> int:
 	var weekday: int = get_weekday(year, month, day)
-	return (weekday - 1) % 7 + 1
-
-
-func _get_first_weekday_iso():
-	return first_weekday if first_weekday != 0 else 7
+	return weekday if weekday != 0 else 7
 
 
 
