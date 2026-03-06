@@ -213,6 +213,8 @@ func get_weekday_formatted(year: int, month: int, day: int, weekday_format: Week
 		6: return calendar_locale.get(weekday_format_prefix + "saturday")
 		0: return calendar_locale.get(weekday_format_prefix + "sunday")
 		7: return calendar_locale.get(weekday_format_prefix + "sunday")
+	
+	printerr("Can't get a formatted weekday: %s" % weekday)
 	return ""
 
 
@@ -241,6 +243,7 @@ func get_month_formatted(month: int, month_format: MonthFormat = MonthFormat.MON
 		11: return calendar_locale.get(month_format_prefix + "november")
 		12: return calendar_locale.get(month_format_prefix + "december")
 	
+	printerr("Can't get a formatted month: %s" % month)
 	return ""
 
 
@@ -417,7 +420,7 @@ func set_calendar_locale(path: String) -> void:
 ## Set which week number system to use when calculating week numbers.
 ## See [enum WeekNumberSystem]
 @warning_ignore("shadowed_variable")
-func set_week_number_system(week_number_system: WeekNumberSystem):
+func set_week_number_system(week_number_system: WeekNumberSystem) -> void:
 	self.week_number_system = week_number_system
 
 
@@ -728,18 +731,10 @@ class Date:
 	## Returns [code]true[/code] or [code]false[/code]
 	## if the date is a valid date or not.
 	func is_valid() -> bool:
-		if month < 1 or month > 12:
-			return false
-		elif day < 1 or day > _get_days_in_month():
-			return false
-		
-		if month == 2 and day == 29 and not is_leap_year():
-			return false
-		
-		return true
+		return _validate()
 	
 	
-	func _validate():
+	func _validate() -> bool:
 		var valid: bool = true
 		var error_msg = "Date is not valid (%s, %s, %s): " % [year, month, day]
 		if month < 1 or month > 12:
@@ -926,7 +921,7 @@ class Date:
 		self.month = month
 		self.day = day
 		
-		if not _validate():
+		if not is_valid():
 			self.year = previous_year
 			self.month = previous_month
 			self.day = previous_day
@@ -936,7 +931,7 @@ class Date:
 	
 	
 	## Set this Date to today's date
-	func set_today():
+	func set_today() -> void:
 		var today_date: Dictionary = Time.get_date_dict_from_system()
 		self.set_date(today_date.year, today_date.month, today_date.day)
 	

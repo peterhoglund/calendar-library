@@ -149,7 +149,7 @@ See [CalendarLocale](#calendarlocale).
 
 <a id="calendar-method-get_days_of_range"></a>**get_days_of_range(days: int, year: int, month: int, day: int, exclusive: bool = false)** : Array\[Date].   
 >Returns a sequence of `Date` objects spanning `days`, starting from the given date.  
->If `exclusive` is `true`, the last day is included in the range length.
+>If `exclusive` is `true`, the last day is excluded in the range length.
 
 <a id="calendar-method-get_leap_days"></a>**get_leap_days(from_year: int, to_year: int, exclusive_to: bool = true)** : int.   
 >Returns the number of leap days between `from_year` and `to_year`. If `exclusive_to` is `false`, includes `to_year`.
@@ -181,7 +181,7 @@ See [WeekdayFormat](#calendar-enumerations) and [CalendarLocale](#calendarlocale
 <a id="calendar-method-get_weekdays_formatted"></a>**get_weekdays_formatted(weekday_format: WeekdayFormat = 1)** : Array\[String].   
 >Returns weekday names starting at `first_weekday`, formatted by `weekday_format`.
 ```gdscript
-cal.set_weekday(Time.WEEKDAY_THURSDAY)
+cal.set_first_weekday(Time.WEEKDAY_THURSDAY)
 cal.get_weekdays_formatted(WeekdayFormat.WEEKDAY_FORMAT_FULL)
 # Outputs Thursday, Friday, Saturday, Sunday, Monday, Tuesday, Wednesday
 ```
@@ -299,7 +299,7 @@ Date stores data about a specific date, composedof the year, month, and day. It 
 <a id="date-method-is_valid"></a>**is_valid()** : bool  
 >Returns whether this date is a valid calendar date.
 
-<a id="date-method-set_date"></a>**set_date(year: int, month: int, day: int)** : void  
+<a id="date-method-set_date"></a>**set_date(year: int, month: int, day: int)** : bool  
 >Sets the year, month, and day of this date. Errors if the date is invalid.
 
 <a id="date-method-set_today"></a>**set_today()** : void  
